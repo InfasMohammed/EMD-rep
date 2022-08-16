@@ -1,0 +1,58 @@
+#Automate_Email_with_mongoDB
+import email
+from pymongo import MongoClient
+from email.message import EmailMessage
+import ssl
+import smtplib
+pyclint = MongoClient("mongodb+srv://ininfas:Ininfas@cluster0.icos73w.mongodb.net/?retryWrites=true&w=majority")
+
+db = pyclint["pypractical"]
+collection = db["eml"]
+resipient_list = []
+
+
+empDetail = [
+            {"Name":"Aakif", "Email": "aakkeef9253@gmail.com"},
+            {"Name":"Gopikrishna", "Email": "sivapakthangopikrishna69@gmail.com"},
+            {"Name":"Infas", "Email": "infmoha8@gmail.com"},
+            {"Name":"fas", "Email": "infasmohamed2018@gmail.com"}
+            
+            ]
+# x=collection.insert_many(empDetail)
+
+# collection.delete_many({}) #Delete All
+
+for z in collection.find({},{"_id": 0,"Name": 0}):
+    z = z.get('Email')
+    resipient_list.append(z)
+print(resipient_list)
+
+#sending mail
+email_sender = 'inmohammedinfas@gmail.com'
+email_password = 'jpqbnbcrjogawlym'
+email_receiver = resipient_list
+
+subject = "Happy Birthday"
+
+body ="""
+The older I get, the more I realize that I am still a little younger than you! Happy birthday.
+
+Regards
+HR Team
+EMD Labs
+
+This is only for test
+"""
+
+em = EmailMessage()
+em['from'] = email_sender
+em['To'] = email_receiver
+em['Subject'] = subject
+em.set_content(body)
+
+cont = ssl.create_default_context()
+
+
+with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=cont) as smtp:
+    smtp.login(email_sender,email_password)
+    smtp.sendmail(email_sender,email_receiver, em.as_string())
